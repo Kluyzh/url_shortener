@@ -4,10 +4,9 @@ from sqlite3 import Connection
 from fastapi import HTTPException, status
 
 from app.config import settings
+from app.logger import setup_logging
 from app.schemas import URLCreate, URLShortenResponse
 from app.utils import generate_short_code
-
-from app.logger import setup_logging
 
 setup_logging()
 
@@ -15,7 +14,9 @@ logger = logging.getLogger(__name__)
 
 
 class URLCRUD:
+    """CRUD класс для URL"""
     async def get_url(self, short_code: str, conn: Connection):
+        """Получение оригинальной ссылки."""
         cursor = conn.cursor()
         cursor.execute(
             'SELECT original_url FROM urls WHERE short_code = ?',
@@ -32,6 +33,7 @@ class URLCRUD:
         return original_url
 
     async def create_url(self, obj_in: URLCreate, conn: Connection):
+        """Создание короткой ссылки."""
         original_url = obj_in.url
         cursor = conn.cursor()
         cursor.execute(

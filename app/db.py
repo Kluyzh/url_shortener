@@ -2,7 +2,6 @@ import logging
 import sqlite3
 
 from app.config import settings
-
 from app.logger import setup_logging
 
 setup_logging()

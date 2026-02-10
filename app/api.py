@@ -6,8 +6,8 @@ from fastapi.responses import RedirectResponse
 
 from app.crud import url_crud
 from app.db import get_db_connection
-from app.schemas import URLCreate, URLShortenResponse
 from app.logger import setup_logging
+from app.schemas import URLCreate, URLShortenResponse
 
 setup_logging()
 logger = logging.getLogger(__name__)
