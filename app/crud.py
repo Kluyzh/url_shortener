@@ -7,11 +7,15 @@ from app.config import settings
 from app.schemas import URLCreate, URLShortenResponse
 from app.utils import generate_short_code
 
+from app.logger import setup_logging
+
+setup_logging()
+
 logger = logging.getLogger(__name__)
 
 
 class URLCRUD:
-    async def get_url(short_code: str, conn: Connection):
+    async def get_url(self, short_code: str, conn: Connection):
         cursor = conn.cursor()
         cursor.execute(
             'SELECT original_url FROM urls WHERE short_code = ?',
@@ -27,15 +31,27 @@ class URLCRUD:
         original_url = result[0]
         return original_url
 
-    async def create_url(obj_in: URLCreate, conn: Connection):
+    async def create_url(self, obj_in: URLCreate, conn: Connection):
         original_url = obj_in.url
-        short_code = generate_short_code()
         cursor = conn.cursor()
+        cursor.execute(
+            'SELECT original_url, short_code FROM urls WHERE original_url = ?',
+            (str(original_url),)
+        )
+        result = cursor.fetchone()
+        if result:
+            short_code = result[1]
+            return URLShortenResponse(
+                original_url=original_url,
+                short_link=f'{settings.base_url}/{short_code}'
+            )
+        short_code = generate_short_code()
         try:
             cursor.execute(
                 'INSERT INTO urls (original_url, short_code) VALUES (?, ?)',
-                (original_url, short_code)
+                (str(original_url), short_code)
             )
+            conn.commit()
         except Exception as e:
             logger.error(f'Database error: {e}')
             raise HTTPException(

@@ -7,7 +7,9 @@ from fastapi.responses import RedirectResponse
 from app.crud import url_crud
 from app.db import get_db_connection
 from app.schemas import URLCreate, URLShortenResponse
+from app.logger import setup_logging
 
+setup_logging()
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
@@ -26,7 +28,11 @@ async def get_url(
     )
 
 
-@router.post('/shorten', response_model=URLShortenResponse)
+@router.post(
+    '/shorten',
+    response_model=URLShortenResponse,
+    status_code=status.HTTP_201_CREATED
+)
 async def shorten_url(
         obj_in: URLCreate,
         conn: Connection = Depends(get_db_connection)

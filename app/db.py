@@ -3,6 +3,10 @@ import sqlite3
 
 from app.config import settings
 
+from app.logger import setup_logging
+
+setup_logging()
+
 logger = logging.getLogger(__name__)
 
 
@@ -16,7 +20,7 @@ def init_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         original_url TEXT NOT NULL,
         short_code TEXT NOT NULL UNIQUE,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
 
@@ -31,7 +35,7 @@ def init_db():
 
 def get_db_connection():
     """Получение соединения с БД."""
-    conn = sqlite3.connect(settings.database_url)
+    conn = sqlite3.connect(settings.database_url, check_same_thread=False)
     try:
         yield conn
     finally:
